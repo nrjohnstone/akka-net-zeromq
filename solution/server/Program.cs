@@ -12,8 +12,7 @@ namespace Server
             var actorSystem = ActorSystem.Create("AkkaNetMqExample");
 
             Props messageProcessorProps = Props.Create(() => new MessageProcessor());
-            IActorRef messageProcessor = actorSystem.ActorOf(messageProcessorProps, "someNonDefaultActor");
-
+            
             var context = NetMQContext.Create();
             var server = context.CreateRouterSocket();
            
@@ -28,6 +27,7 @@ namespace Server
                 PrintFrames("Server receiving", clientMessage);
                 if (clientMessage.FrameCount == 3)
                 {
+                    IActorRef messageProcessor = actorSystem.ActorOf(messageProcessorProps);
                     messageProcessor.Tell(new MessageProcessor.ProcessMessage(clientMessage, server));                    
                 }
             }

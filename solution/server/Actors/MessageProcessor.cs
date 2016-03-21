@@ -22,10 +22,14 @@ namespace Server.Actors
         public MessageProcessor()
         {
             Receive<ProcessMessage>(msg => HandleProcessMessage(msg));
+            ActorId = Guid.NewGuid().ToString();
         }
+
+        public string ActorId { get; set; }
 
         private void HandleProcessMessage(ProcessMessage msg)
         {
+            Console.WriteLine($"Message handled by actor {ActorId}");
             var clientMessage = msg.ClientMessage;
             var server = msg.Server;
 
