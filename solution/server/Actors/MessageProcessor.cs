@@ -32,8 +32,7 @@ namespace Server.Actors
             var clientAddress = clientMessage[0];
             var clientOriginalMessage = clientMessage[2].ConvertToString();
 
-            string response = string.Format("{0}| back from server {1}",
-                clientOriginalMessage, DateTime.Now.ToLongTimeString());
+            var response = new byte[] {1, 2, 3, 4};
 
             var messageToClient = new NetMQMessage();
             messageToClient.Append(clientAddress);

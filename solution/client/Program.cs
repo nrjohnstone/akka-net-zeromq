@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using NetMQ;
@@ -53,16 +54,18 @@ namespace client
         static void Client_ReceiveReady(object sender, NetMQSocketEventArgs e)
         {
             bool hasmore = false;
-            e.Socket.Receive(out hasmore);
+            e.Socket.ReceiveFrameBytes(out hasmore);
             if (hasmore)
             {
-                string result = e.Socket.ReceiveFrameString(out hasmore);
-                string responseUuid = result.Split(new[] {'|'})[0];
-                
-                
-                Console.WriteLine("REPLY {0}", result);
-                if (!responseUuid.Equals(_uuid.ToString()))
-                    throw new Exception("Response UUID does not match client");
+                var result = e.Socket.ReceiveMultipartMessage();
+
+                byte[] data = result[0].ToByteArray();
+
+                Console.WriteLine("REPLY length = {0}", data.Length);
+
+                if (!data.SequenceEqual(new byte[] {1,2,3,4}))
+                    throw new Exception();
+            
             }
         }
 
