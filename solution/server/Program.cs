@@ -1,12 +1,19 @@
 ﻿using System;
+using Akka.Actor;
 using NetMQ;
+using Server.Actors;
 
-namespace server
+namespace Server
 {
     class Program
     {
         static void Main(string[] args)
         {
+            var actorSystem = ActorSystem.Create("AkkaNetMqExample");
+
+            Props messageProcessorProps = Props.Create(() => new MessageProcessor());
+            IActorRef messageProcessor = actorSystem.ActorOf(messageProcessorProps, "someNonDefaultActor");
+
             var context = NetMQContext.Create();
             var server = context.CreateRouterSocket();
            
@@ -21,18 +28,9 @@ namespace server
                 PrintFrames("Server receiving", clientMessage);
                 if (clientMessage.FrameCount == 3)
                 {
-                    var clientAddress = clientMessage[0];
-                    var clientOriginalMessage = clientMessage[2].ConvertToString();
-                    string response = string.Format("{0} back from server {1}",
-                        clientOriginalMessage, DateTime.Now.ToLongTimeString());
-                    var messageToClient = new NetMQMessage();
-                    messageToClient.Append(clientAddress);
-                    messageToClient.AppendEmptyFrame();
-                    messageToClient.Append(response);
-                    server.SendMultipartMessage(messageToClient);
+                    messageProcessor.Tell(new MessageProcessor.ProcessMessage(clientMessage, server));                    
                 }
             }
-
         }
 
         static void PrintFrames(string operationType, NetMQMessage message)
