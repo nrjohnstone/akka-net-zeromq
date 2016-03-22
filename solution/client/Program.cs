@@ -13,7 +13,7 @@ namespace client
 
         static void Main(string[] args)
         {
-            var delay = 1000;
+            var delay = 2000;
 
             using (var context = NetMQContext.Create())
             {
@@ -63,8 +63,8 @@ namespace client
 
                 Console.WriteLine("REPLY length = {0}", data.Length);
 
-                if (!data.SequenceEqual(new byte[] {1,2,3,4}))
-                    throw new Exception();
+                //if (!data.SequenceEqual(new byte[] {1,2,3,4}))
+                //    throw new Exception();
             
             }
         }
